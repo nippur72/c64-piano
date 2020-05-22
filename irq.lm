@@ -1,0 +1,46 @@
+sub install_irq()
+    sei
+
+    lda #%01111111
+    sta $DC0D	               ; switch off interrupts signals from CIA-1
+    and $D011
+    sta $D011	               ; clear most significant bit in VIC's raster register
+
+    ld $D012, #210             ; set the raster line number where interrupt should occur
+
+    ld16 $0314, #irq_routine   ; set the interrupt vector to point to interrupt routine
+
+    ld $D01A, #%00000001       ; enable raster interrupt signals from VIC
+    cli
+end sub
+
+dim counter1 as byte
+dim VOLUME as byte at 54296
+
+irq_routine:
+    inc video_ram
+    inc 53280
+
+    inc counter1
+
+    lda counter1
+    and #3
+    if a = #0  then
+        ld VOLUME, #1
+    else
+        if a = #2 then
+            ld VOLUME, #15
+        else
+        /*
+            if a = #64 then
+                ld counter1, #0
+            end if
+        */
+        end if
+
+    end if
+
+    dec 53280
+
+    asl $D019	; acknowledge the interrupt by clearing the VIC's interrupt flag.
+    jmp $EA31   ; continue interrupt routine into ROM

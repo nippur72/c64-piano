@@ -73,6 +73,7 @@
    include "siel.lm"
    include "c64_keyboard.lm"
    include "freq.lm"
+   include "irq.lm"
 
 ; ============ VOCI SID =============
 const SID1 = $D400
@@ -131,10 +132,12 @@ end sub
 dim exit_code as byte at $fb
 
 sub main()
-   sei
    jsr init_sid             ; inizializza tutte le voci del SID
 
+   ; jsr install_irq          ; installa la routine IRQ per gli effetti
+
    do
+      ;inc VIDEO_RAM+1
       jsr main_loop       
 
       ld exit_code, #0
@@ -336,3 +339,4 @@ sub play_voice_y_key_x()
    if y=#4 then sta SID2+[1*7]+4    
    if y=#5 then sta SID2+[2*7]+4    
 end sub
+
