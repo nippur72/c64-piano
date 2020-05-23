@@ -151,7 +151,8 @@ sub main()
       end if
    loop while exit_code = #0
 
-   ; exit to basic
+   ; clears keyboard buffer and exit to basic
+   ld 198, #0
 end sub
 
 // =====================================================================================
