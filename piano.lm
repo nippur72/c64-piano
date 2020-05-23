@@ -39,11 +39,11 @@
       270 print:input "your choice";c
       280 on c gosub 300,310,320,330,340
       290 goto 120
-      300 input "attack (0-15)";a:return
-      310 input "decay (0-15)";d:return
-      320 input "sustain (0-15)";s:return
-      330 input "release (0-15)";r:return
-      340 input "waveform (0-3)";w:return
+      300 input "attack (0-15)";a:a=a and 15:return
+      310 input "decay (0-15)";d:d=d and 15:return
+      320 input "sustain (0-15)";s:s=s and 15:return
+      330 input "release (0-15)";r:r=r and 15:return
+      340 input "waveform (0-3)";w:w=w and 3:return
     19999 end
     60000 print "{home}{down}{down}{down}attack  :";a
     60010 print "decay   :";d;h$;"   "
