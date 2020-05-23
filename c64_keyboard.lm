@@ -225,7 +225,13 @@ sub simulate_siel()
    simk #KEYBOARD_ROW_4, #KEY_9, curr_key_status+25
    simk #KEYBOARD_ROW_4, #KEY_O, curr_key_status+26
    simk #KEYBOARD_ROW_4, #KEY_0, curr_key_status+27
-   simk #KEYBOARD_ROW_5, #KEY_P, curr_key_status+28   
+   simk #KEYBOARD_ROW_5, #KEY_P, curr_key_status+28
+
+   simk #ROW_KEY_AT,       #KEY_AT,       curr_key_status+29
+   simk #ROW_KEY_EQUAL,    #KEY_EQUAL,    curr_key_status+30
+   simk #ROW_KEY_ASTERISK, #KEY_ASTERISK, curr_key_status+31
+   simk #ROW_KEY_DELETE,   #KEY_DELETE,   curr_key_status+32
+   simk #ROW_KEY_RETURN,   #KEY_RETURN,   curr_key_status+33
 
    ; fila inferiore
    simk #KEYBOARD_ROW_1, #KEY_Z,     curr_key_status+0
