@@ -7,12 +7,13 @@
    org BASIC_RAM
 
    basic start compact
-       10 dim wf$(3)
+       10 dim wf$(3),sid(7),sid$(7)
        20 wf$(0)=chr$(206)+chr$(205)
        30 wf$(1)=chr$(206)+chr$(180)
        40 wf$(2)=chr$(207)+chr$(204)
        50 wf$(3)=chr$(166)+chr$(166)
        60 h$=chr$(157)
+       65 nsid=2:sid$(0)="d400":sid$(1)="d420":gosub 50000
        70 w=1:rem waveform 0-3     
        80 a=5:rem attack 0-15
        90 d=5:rem decay 0-15
@@ -31,25 +32,43 @@
       190 if peek({exit_code})=1 then 210
       200 print "unexpected condition":end
       210 print "{down}change settings{down}"
-      220 print "1-attack"
-      230 print "2-decay"
+      220 print "1-attack     6-sid 1"
+      230 print "2-decay      7-sid 2"
       240 print "3-sustain"
       250 print "4-release"
       260 print "5-waveform"
       270 print:input "your choice";c
-      280 on c gosub 300,310,320,330,340
+      280 on c gosub 300,310,320,330,340,350,360
       290 goto 120
       300 input "attack (0-15)";a:a=a and 15:return
       310 input "decay (0-15)";d:d=d and 15:return
       320 input "sustain (0-15)";s:s=s and 15:return
       330 input "release (0-15)";r:r=r and 15:return
       340 input "waveform (0-3)";w:w=w and 3:return
+      350 input "sid 1 (hex)";sid$(0):gosub 50000:return
+      350 input "sid 2 (hex)";sid$(1):gosub 50000:return
     19999 end
+    50000 for j=0 to nsid-1
+    50020 sid(j)=0
+    50030 for i=0 to 3
+    50040 n=asc(mid$(sid$(j),i+1,1))-48
+    50050 if n<10 then sid(j)=sid(j)+n*(16^(3-i))
+    50060 if n>16 then sid(j)=sid(j)+(n-7)*(16^(3-i))
+    50070 next
+    50080 next
+    50090 poke {SID1},sid(0)-(int(sid(0)/256)*256)
+    50100 poke {SID1}+1,int(sid(0)/256)
+    50110 poke {SID2},sid(1)-(int(sid(1)/256)*256)
+    50120 poke {SID2}+1,int(sid(1)/256)
+    59999 return
     60000 print "{home}{down}{down}{down}attack  :";a
     60010 print "decay   :";d;h$;"   "
     60020 print "sustain :";s;h$;"   "
     60030 print "release :";r;h$;"   "
     60040 print "waveform: ";wf$(w)
+    60050 print "{home}{down}{down}{down}";
+    60060 print ,,"sid 1: $"sid$(0)sid(0)
+    60060 print ,,"sid 2: $"sid$(1)sid(1)
     60999 return
     61000 poke {REG4},2^(w+4)
     61010 poke {REG5},a*16+d
@@ -76,8 +95,8 @@
    include "irq.lm"
 
 ; ============ VOCI SID =============
-const SID1 = $D400
-const SID2 = $D420
+dim SID1 as word init $d400
+dim SID2 as word init $d420
 const NVOCI = 6
 
 ; impostazioni SID per tutte le voci
