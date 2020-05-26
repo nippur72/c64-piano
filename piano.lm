@@ -118,26 +118,26 @@ const NVOCI = 6
 
 ; tabella gli indirizzi delle singole voci nei vari SID
 voice_address_hi:
-   .byte ($d400 + 0*7)/256
-   .byte ($d400 + 1*7)/256
-   .byte ($d400 + 2*7)/256
-   .byte ($d420 + 0*7)/256
-   .byte ($d420 + 1*7)/256
-   .byte ($d420 + 2*7)/256
-   .byte ($d440 + 0*7)/256
-   .byte ($d440 + 1*7)/256
-   .byte ($d440 + 1*7)/256
+   .byte 0      ;  ($d400 + 0*7)/256
+   .byte 0      ;  ($d400 + 1*7)/256
+   .byte 0      ;  ($d400 + 2*7)/256
+   .byte 0      ;  ($d420 + 0*7)/256
+   .byte 0      ;  ($d420 + 1*7)/256
+   .byte 0      ;  ($d420 + 2*7)/256
+   .byte 0      ;  ($d440 + 0*7)/256
+   .byte 0      ;  ($d440 + 1*7)/256
+   .byte 0      ;  ($d440 + 1*7)/256
 
 voice_address_lo:
-   .byte ($d400 + 0*7)%256
-   .byte ($d400 + 1*7)%256
-   .byte ($d400 + 2*7)%256
-   .byte ($d420 + 0*7)%256
-   .byte ($d420 + 1*7)%256
-   .byte ($d420 + 2*7)%256
-   .byte ($d440 + 0*7)%256
-   .byte ($d440 + 1*7)%256
-   .byte ($d440 + 1*7)%256
+   .byte 0      ;  ($d400 + 0*7)%256
+   .byte 0      ;  ($d400 + 1*7)%256
+   .byte 0      ;  ($d400 + 2*7)%256
+   .byte 0      ;  ($d420 + 0*7)%256
+   .byte 0      ;  ($d420 + 1*7)%256
+   .byte 0      ;  ($d420 + 2*7)%256
+   .byte 0      ;  ($d440 + 0*7)%256
+   .byte 0      ;  ($d440 + 1*7)%256
+   .byte 0      ;  ($d440 + 1*7)%256
 
 
 ; impostazioni SID per tutte le voci
