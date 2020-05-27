@@ -54,7 +54,7 @@
       330 input "release (0-15)";r:r=r and 15:return
       340 input "waveform (0-3)";w:w=w and 3:return
       350 input "sid 1 (hex)";sid$(0):gosub 50000:return
-      350 input "sid 2 (hex)";sid$(1):gosub 50000:return
+      360 input "sid 2 (hex)";sid$(1):gosub 50000:return
     19999 end
 
     50000 rem ==== update voice sid addresses
