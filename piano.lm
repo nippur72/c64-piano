@@ -238,16 +238,12 @@ end sub
 sub init_sid()
    ; inizializza i valori ADSR per tutte le voci dei SID
 
-   ;for voce=#(NVOCI-1) to #0 step #-1
-   ld voce, #(NVOCI-1)
-   do
+   for voce=#(NVOCI-1) to #0 step #-1
       ld regn, #2  : ld valore, REG2 : jsr scrivi_voce    ; duty cycle low byte
       ld regn, #3  : ld valore, REG3 : jsr scrivi_voce    ; duty cycle high byte
       ld regn, #5  : ld valore, REG5 : jsr scrivi_voce    ; attack-decay
       ld regn, #6  : ld valore, REG6 : jsr scrivi_voce    ; sustain release
-      dec voce
-   loop while not negative
-   ;next
+   next
 
    ; TODO impostare volumi
 end sub
