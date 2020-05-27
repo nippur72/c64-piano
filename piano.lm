@@ -395,12 +395,12 @@ end sub
 ;       La routine lascia intatti i registri X e Y
 ; =====================================================================================
 
-dim voce   as byte
-dim regn   as byte
-dim valore as byte
+dim voce   as byte at $fc
+dim regn   as byte at $fd
+dim valore as byte at $fe
 
 dim ptr    as word at $03     ; puntatore usato per puntare al SID
-dim tmpy   as byte            ; salva il registro Y
+dim tmpy   as byte at $ff     ; salva il registro Y
 
 sub scrivi_voce()
    sty tmpy            ; salva registro che verrà sporcati
