@@ -83,7 +83,7 @@
     59070 next
     59080 return
 
-    60000 print "{home}{down}{down}{down}attack  :";a
+    60000 print "{home}{down}{down}{down}attack   :";a
     60010 print "decay    :";d;h$;"   "
     60020 print "sustain  :";s;h$;"   "
     60030 print "release  :";r;h$;"   "
