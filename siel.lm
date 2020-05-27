@@ -14,11 +14,11 @@ const SIEL_NKEYS  = 56      ; 49 tasti reali, i rimanenti sono fantasma
 bit_counter: byte
 
 sub read_siel()
-   ldy #0                           ; y points to curr_key_status 
-   for x=#0 to #SIEL_LENGTH         ; x points to SIEL keyboard read ports
-      ld bit_counter, #8            ; for each byte, counts 8 bits
+   ldy #0                            ; y points to curr_key_status
+   for x=#SIEL_LENGTH to #0 step #-1 ; x points to SIEL keyboard read ports
+      ld bit_counter, #8             ; for each byte, counts 8 bits
 
-      lda SIEL_START,x              ; reads the SIEL keyboard
+      lda SIEL_START,x               ; reads the SIEL keyboard
 
       ; loop that decodes the SIEL
       ; byte into separate bits
