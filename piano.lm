@@ -1,3 +1,7 @@
+   ;
+   ; TODO convertire i for ... next in do ... loop con decremento
+   ;
+
    processor 6502
 
    include <macros.lm>
@@ -7,22 +11,26 @@
    org BASIC_RAM
 
    basic start compact
-       10 dim wf$(3)
-       20 wf$(0)=chr$(206)+chr$(205)
-       30 wf$(1)=chr$(206)+chr$(180)
-       40 wf$(2)=chr$(207)+chr$(204)
-       50 wf$(3)=chr$(166)+chr$(166)
-       60 h$=chr$(157)
-       70 w=1:rem waveform 0-3     
-       80 a=5:rem attack 0-15
-       90 d=5:rem decay 0-15
-      100 s=15:rem sustain 0-15
-      110 r=5:rem release 0-15
-      115 gosub 63000:rem pulse wave setting
-      120 print chr$(142)"{clr}{white}*** c64 piano ***"
-      125 print "by nino porcino & francesco sblendorio"
-      126 print
-      130 poke 54272+24,15:rem full volume     
+       10 nsid={(NVOCI/3)}
+       20 dim sid(nsid),sid$(nsid)
+       21 sid$(0)="d400"
+       22 sid$(1)="d420"
+       23 gosub 50000
+       30 dim wf$(3)
+       31 wf$(0)=chr$(206)+chr$(205)
+       32 wf$(1)=chr$(206)+chr$(180)
+       33 wf$(2)=chr$(207)+chr$(204)
+       34 wf$(3)=chr$(166)+chr$(166)
+       80 h$=chr$(157)
+       90 w=1:rem waveform 0-3
+       92 a=5:rem attack 0-15
+       93 d=5:rem decay 0-15
+       94 s=15:rem sustain 0-15
+       95 r=5:rem release 0-15
+       96 c=2570:rem duty cycle 0-4095
+      100 print chr$(142)"{clr}{white}*** c64 piano ***"
+      110 print "by nino porcino & francesco sblendorio"
+      120 print
       140 gosub 60000     
       150 gosub 61000
       160 gosub 62000
@@ -31,43 +39,73 @@
       190 if peek({exit_code})=1 then 210
       200 print "unexpected condition":end
       210 print "{down}change settings{down}"
-      220 print "1-attack"
-      230 print "2-decay"
-      240 print "3-sustain"
+      220 print "1-attack     6-duty cyle"
+      230 print "2-decay      7-sid 1"
+      240 print "3-sustain    8-sid 2"
       250 print "4-release"
       260 print "5-waveform"
-      270 print:input "your choice";c
-      280 on c gosub 300,310,320,330,340
-      290 goto 120
+      270 print:input "your choice";x
+      280 on x gosub 300,310,320,330,340,345,350,360
+      290 goto 100
       300 input "attack (0-15)";a:a=a and 15:return
       310 input "decay (0-15)";d:d=d and 15:return
       320 input "sustain (0-15)";s:s=s and 15:return
       330 input "release (0-15)";r:r=r and 15:return
       340 input "waveform (0-3)";w:w=w and 3:return
+      345 input "duty cycle (0-4095)";c:c=c and 4095:return
+      350 input "sid 1 (hex)";sid$(0):gosub 50000:return
+      360 input "sid 2 (hex)";sid$(1):gosub 50000:return
     19999 end
-    60000 print "{home}{down}{down}{down}attack  :";a
-    60010 print "decay   :";d;h$;"   "
-    60020 print "sustain :";s;h$;"   "
-    60030 print "release :";r;h$;"   "
-    60040 print "waveform: ";wf$(w)
+
+    50000 rem ==== update voice sid addresses
+    50010 for j=0 to nsid-1
+    50020   x$ = sid$(j)
+    50030   gosub 59000
+    50040   sid(j) = x
+    50045   poke sid(j)+24,15
+    50050 next
+    50060 rem write address into tables
+    50100 j=0:k=0
+    50110 for n=0 to {(NVOCI-1)}
+    50120    x = sid(j) + k*7
+    50130    poke {voice_address_hi}+n, int(x/256)
+    50140    poke {voice_address_lo}+n, x-(int(x/256)*256)
+    50150    k=k+1:if k=3 then j=j+1:k=0
+    50160 next
+    50170 return
+
+    59000 rem === convert hex in x$ to decimal in x
+    59020 x=0
+    59030 for i=0 to 3
+    59040   n = asc(mid$(x$,i+1,1))-48
+    59050   if n<10 then x = x + n*(16^(3-i))
+    59060   if n>16 then x = x + (n-7)*(16^(3-i))
+    59070 next
+    59080 return
+
+    60000 print "{home}{down}{down}{down}attack   :";a
+    60010 print "decay    :";d;h$;"   "
+    60020 print "sustain  :";s;h$;"   "
+    60030 print "release  :";r;h$;"   "
+    60040 print "waveform : ";wf$(w)
+    60045 print "duty cyc.:";c;h$;"    "
+    60050 print "{home}{down}{down}{down}";
+    60060 print ,,"sid 1: $"sid$(0)sid(0)
+    60060 print ,,"sid 2: $"sid$(1)sid(1)
     60999 return
-    61000 poke {REG4},2^(w+4)
-    61010 poke {REG5},a*16+d
-    61020 poke {REG6},s*16+r
-    61999 return
-    62000 print "{home}{down}{down}{down}{down}{down}{down}{down}{down}press:{down}"
+
+    61000 poke {REG2}, int(c/256)
+    61010 poke {REG3}, c-(int(c/256)*256)
+    61020 poke {REG4}, 2^(w+4)
+    61030 poke {REG5}, a*16+d
+    61040 poke {REG6}, s*16+r
+    61050 return
+
+    62000 print "{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}press:{down}"
     62010 print "f1 - to change parameters"
     62020 print "f7 - to exit"
-    62999 return
-    63000 rem initialize pulse wave
-    63010 hi=10:lo=10
-    63020 poke 54274,hi:poke 54275,lo
-    63030 poke 54281,hi:poke 54282,lo
-    63040 poke 54288,hi:poke 54289,lo
-    63050 poke 54274+32,hi:poke 54275+32,lo
-    63060 poke 54281+32,hi:poke 54282+32,lo
-    63070 poke 54288+32,hi:poke 54289+32,lo
-    63999 return
+    62030 return
+
    basic end
 
    include "siel.lm"
@@ -76,11 +114,35 @@
    include "irq.lm"
 
 ; ============ VOCI SID =============
-const SID1 = $D400
-const SID2 = $D420
 const NVOCI = 6
 
-; impostazioni SID per tutte le voci
+; tabella gli indirizzi delle singole voci nei vari SID
+voice_address_hi:
+   .byte 0      ;  ($d400 + 0*7)/256
+   .byte 0      ;  ($d400 + 1*7)/256
+   .byte 0      ;  ($d400 + 2*7)/256
+   .byte 0      ;  ($d420 + 0*7)/256
+   .byte 0      ;  ($d420 + 1*7)/256
+   .byte 0      ;  ($d420 + 2*7)/256
+   .byte 0      ;  ($d440 + 0*7)/256
+   .byte 0      ;  ($d440 + 1*7)/256
+   .byte 0      ;  ($d440 + 1*7)/256
+
+voice_address_lo:
+   .byte 0      ;  ($d400 + 0*7)%256
+   .byte 0      ;  ($d400 + 1*7)%256
+   .byte 0      ;  ($d400 + 2*7)%256
+   .byte 0      ;  ($d420 + 0*7)%256
+   .byte 0      ;  ($d420 + 1*7)%256
+   .byte 0      ;  ($d420 + 2*7)%256
+   .byte 0      ;  ($d440 + 0*7)%256
+   .byte 0      ;  ($d440 + 1*7)%256
+   .byte 0      ;  ($d440 + 1*7)%256
+
+
+; impostazioni SID da applicare a tutte le voci
+dim REG2 as byte   ; duty cycle low byte
+dim REG3 as byte   ; duty cycle high byte
 dim REG4 as byte   ; waveform + gate a zero
 dim REG5 as byte   ; attack + decay
 dim REG6 as byte   ; sustain + release
@@ -105,7 +167,7 @@ stato_voci: ds NVOCI, VOICE_STOPPED        ; stato delle voci dei SID (VOICE_STO
 // stampa a video i buffer a scopo di debug
 // =====================================================================================
 sub dump_buffers()
-   for x=#0 to #SIEL_NKEYS-1
+   for x=#(SIEL_NKEYS-1) to #0 step #-1
       lda curr_key_status,x
       sta VIDEO_RAM,x
 
@@ -119,7 +181,7 @@ sub dump_buffers()
       sta VIDEO_RAM+SCREEN_COLS*12,x
    next
 
-   for x=#0 to #NVOCI-1
+   for x=#(NVOCI-1) to #0 step #-1
       lda stato_voci,x
       sta VIDEO_RAM+SCREEN_COLS*16,x
    next
@@ -134,10 +196,9 @@ dim exit_code as byte at $fb
 sub main()
    jsr init_sid             ; inizializza tutte le voci del SID
 
-   ; jsr install_irq          ; installa la routine IRQ per gli effetti
+   ; jsr install_irq        ; installa la routine IRQ per gli effetti
 
    do
-      ;inc VIDEO_RAM+1
       jsr main_loop       
 
       ld exit_code, #0
@@ -169,35 +230,22 @@ sub main_loop()
 
    jsr calc_new_key_pressed ; rileva i nuovi tasti premuti
 
-   #ifdef DEBUG then jsr dump_buffers ; debug a video 
+   #ifdef DEBUG then jsr dump_buffers ; debug a video
 
    jsr play_new_keys        ; suona i nuovi tasti
 end sub
 
 sub init_sid()
-   ; inizializza tutte le voci del SID
-   ;ld SID1+[0*7]+4, REG4     
-   ;ld SID1+[1*7]+4, REG4
-   ;ld SID1+[2*7]+4, REG4
-   ;ld SID2+[0*7]+4, REG4     
-   ;ld SID2+[1*7]+4, REG4
-   ;ld SID2+[2*7]+4, REG4
+   ; inizializza i valori ADSR per tutte le voci dei SID
 
-   ; attack-decay
-   ld SID1+[0*7]+5, REG5     
-   ld SID1+[1*7]+5, REG5
-   ld SID1+[2*7]+5, REG5
-   ld SID2+[0*7]+5, REG5     
-   ld SID2+[1*7]+5, REG5
-   ld SID2+[2*7]+5, REG5
+   for voce=#(NVOCI-1) to #0 step #-1
+      ld regn, #2  : ld valore, REG2 : jsr scrivi_voce    ; duty cycle low byte
+      ld regn, #3  : ld valore, REG3 : jsr scrivi_voce    ; duty cycle high byte
+      ld regn, #5  : ld valore, REG5 : jsr scrivi_voce    ; attack-decay
+      ld regn, #6  : ld valore, REG6 : jsr scrivi_voce    ; sustain release
+   next
 
-   ; sustain release
-   ld SID1+[0*7]+6, REG6     
-   ld SID1+[1*7]+6, REG6
-   ld SID1+[2*7]+6, REG6
-   ld SID2+[0*7]+6, REG6     
-   ld SID2+[1*7]+6, REG6
-   ld SID2+[2*7]+6, REG6
+   ; TODO impostare volumi
 end sub
 
 // =====================================================================================
@@ -206,7 +254,7 @@ end sub
 // =====================================================================================
 
 sub copy_curr_in_last() 
-   for x=#0 to #(SIEL_NKEYS-1)
+   for x=#(SIEL_NKEYS-1) to #0 step #-1
       lda curr_key_status,x
       sta last_key_status,x
    next
@@ -217,7 +265,7 @@ end sub
 // =====================================================================================
 
 sub stop_released_keys() 
-   for x=#0 to #(SIEL_NKEYS-1)
+   for x=#(SIEL_NKEYS-1) to #0 step #-1
       lda last_key_status,x
       if a=#KEY_PRESSED then
          lda curr_key_status,x
@@ -238,24 +286,20 @@ sub rilascia_tasto_x()
    ; se il tasto stava suonando una voce
    if a<>#VOICE_NONE then      
 
-      lda #VOICE_STOPPED          ; marca la voce y come VOICE_STOPPED
+      lda #VOICE_STOPPED          ; marca la voce Y come VOICE_STOPPED
       sta stato_voci,y            ; 
 
-      lda #VOICE_NONE             ; marca il tasto come nessuna voce
+      lda #VOICE_NONE             ; marca il tasto X come nessuna voce
       sta key_voices,x            ;
 
-      ; silenzia il SID associato alla voce
-      ; abbassa il bit "gate" del registro S+4
-      ; TODO trovare un modo più elegante
-      
-      lda REG4                         ; carica waveform + gate = 0 in S+4
-      if y=#0 then sta SID1+[0*7]+4     
-      if y=#1 then sta SID1+[1*7]+4     
-      if y=#2 then sta SID1+[2*7]+4     
-      if y=#3 then sta SID2+[0*7]+4     
-      if y=#4 then sta SID2+[1*7]+4     
-      if y=#5 then sta SID2+[2*7]+4     
-            
+      ; silenzia il SID associato alla voce Y
+      ; abbassa il bit "gate" del registro +4
+
+      sty voce                    ; voce y
+      ld regn, #4                 ; registro offset +4
+      ld valore, REG4             ; carica waveform + gate = 0 in S+4
+      jsr scrivi_voce
+
    end if
 end sub
 
@@ -264,7 +308,7 @@ end sub
 // =====================================================================================
 
 sub calc_new_key_pressed() 
-   for x=#0 to #(SIEL_NKEYS-1)
+   for x=#(SIEL_NKEYS-1) to #0 step #-1
       lda last_key_status,x
       if a=#KEY_RELEASED then
          lda curr_key_status,x         
@@ -280,7 +324,7 @@ end sub
 // =====================================================================================
 
 sub play_new_keys() 
-   for x=#0 to #SIEL_NKEYS-1
+   for x=#(SIEL_NKEYS-1) to #0 step #-1
       lda new_key_pressed,x
       if a=#KEY_PRESSED then
          jsr play_new_key_x
@@ -294,7 +338,7 @@ end sub
 
 sub play_new_key_x()
    ; trova la prima voce libera
-   for y=#0 to #(NVOCI-1)
+   for y=#(NVOCI-1) to #0 step #-1
       lda stato_voci,y
       if a=#VOICE_STOPPED then
          jsr play_voice_y_key_x
@@ -304,40 +348,71 @@ sub play_new_key_x()
 end sub
 
 sub play_voice_y_key_x()
-   tya                       ; indica che il tasto suona la voce y
+   tya                       ; indica che il tasto x suona la voce y
    sta key_voices,x          ;
    
    lda #VOICE_PLAYING        ; indica che la voce y sta suonando
    sta stato_voci,y          ;        
-   
-   ; scrive frequenza byte basso + byte alto
 
-   lda FREQTABLE_LOW,x       
-   if y=#0 then sta SID1+[0*7]+0
-   if y=#1 then sta SID1+[1*7]+0
-   if y=#2 then sta SID1+[2*7]+0
-   if y=#3 then sta SID2+[0*7]+0
-   if y=#4 then sta SID2+[1*7]+0
-   if y=#5 then sta SID2+[1*7]+0
+   ; scrittura nel SID
 
-   lda FREQTABLE_HI,x       
-   if y=#0 then sta SID1+[0*7]+1
-   if y=#1 then sta SID1+[1*7]+1
-   if y=#2 then sta SID1+[2*7]+1
-   if y=#3 then sta SID2+[0*7]+1
-   if y=#4 then sta SID2+[1*7]+1
-   if y=#5 then sta SID2+[1*7]+1
+   sty voce              ; voce (non cambia per le tre scritture successive)
 
-   ; scrive gate
+   ; ==== FREQ byte basso
+   ld  regn, #0          ; registro (offset +0)
+   lda FREQTABLE_LOW,x   ;
+   sta valore            ; valore
+   jsr scrivi_voce       ;
 
-   lda REG4                         ; carica waveform 
-   or  #1                           ; + gate = 1 in S+4
+   ; ==== FREQ byte alto
+   inc regn              ; registro (offset +1)
+   lda FREQTABLE_HI,x    ;
+   sta valore            ; valore
+   jsr scrivi_voce       ;
 
-   if y=#0 then sta SID1+[0*7]+4    
-   if y=#1 then sta SID1+[1*7]+4    
-   if y=#2 then sta SID1+[2*7]+4    
-   if y=#3 then sta SID2+[0*7]+4    
-   if y=#4 then sta SID2+[1*7]+4    
-   if y=#5 then sta SID2+[2*7]+4    
+   ; ==== gate on
+   ld  regn, #4          ; registro (offset +4)
+   lda REG4              ; carica waveform
+   or  #1                ; + gate = 1 in S+4
+   sta valore            ; valore
+   jsr scrivi_voce       ;
+
+end sub
+
+; =====================================================================================
+; Nome: scrivi_voce()
+; Scopo: scrive un valore nel registro del SID associato alla voce specificata
+; Input:
+;        voce     la voce (0..NVOCI-1) dove scrivere
+;        regn     l'offset del registro SID dove scrivere
+;        valore   il valore da scrivere
+;
+; Note: il SID da utilizzare viene stabilito in base alla tabella "voice_address_lo/hi"
+;
+;       La routine lascia intatti i registri X e Y
+; =====================================================================================
+
+dim voce   as byte at $fc
+dim regn   as byte at $fd
+dim valore as byte at $fe
+
+dim ptr    as word at $03     ; puntatore usato per puntare al SID
+dim tmpy   as byte at $ff     ; salva il registro Y
+
+sub scrivi_voce()
+   sty tmpy            ; salva registro che verrà sporcati
+
+   ldy voce            ; y = numero SID della voce
+
+   lda voice_address_lo,y : sta ptr     ;
+   lda voice_address_hi,y : sta ptr+1   ; (ptr) = indirizzo SID
+
+   ldy regn            ; y = numero registro (offset)
+
+   lda valore          ; a = valore da scrivere
+
+   sta (ptr),y         ; equivale a: &(sid_addres[voce]+regn) = valore
+
+   ldy tmpy            ; recupera registri sporcati
 end sub
 
