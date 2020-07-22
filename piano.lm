@@ -139,6 +139,11 @@ voice_address_lo:
    .byte 0      ;  ($d440 + 1*7)%256
    .byte 0      ;  ($d440 + 2*7)%256
 
+const WAVEFORM_TRIANGLE = 0
+const WAVEFORM_SAWTOOTH = 1
+const WAVEFORM_SQUARE   = 2
+const WAVEFORM_NOISE    = 3
+
 
 ; impostazioni SID da applicare a tutte le voci
 dim REG2 as byte   ; duty cycle low byte
