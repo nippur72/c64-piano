@@ -1,5 +1,6 @@
    ;
    ; TODO convertire i for ... next in do ... loop con decremento
+   ; TODO investigare bug che si scatena se si toglie 'include "irq.lm"' (macro ld16)
    ;
 
    processor 6502
