@@ -126,7 +126,7 @@ voice_address_hi:
    .byte 0      ;  ($d420 + 2*7)/256
    .byte 0      ;  ($d440 + 0*7)/256
    .byte 0      ;  ($d440 + 1*7)/256
-   .byte 0      ;  ($d440 + 1*7)/256
+   .byte 0      ;  ($d440 + 2*7)/256
 
 voice_address_lo:
    .byte 0      ;  ($d400 + 0*7)%256
@@ -137,7 +137,7 @@ voice_address_lo:
    .byte 0      ;  ($d420 + 2*7)%256
    .byte 0      ;  ($d440 + 0*7)%256
    .byte 0      ;  ($d440 + 1*7)%256
-   .byte 0      ;  ($d440 + 1*7)%256
+   .byte 0      ;  ($d440 + 2*7)%256
 
 
 ; impostazioni SID da applicare a tutte le voci
