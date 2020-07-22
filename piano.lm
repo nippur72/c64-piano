@@ -94,11 +94,11 @@
     60060 print ,,"sid 2: $"sid$(1)sid(1)
     60999 return
 
-    61000 poke {REG2}, int(c/256)
-    61010 poke {REG3}, c-(int(c/256)*256)
-    61020 poke {REG4}, 2^(w+4)
-    61030 poke {REG5}, a*16+d
-    61040 poke {REG6}, s*16+r
+    61000 poke {REG2_right}, int(c/256)
+    61010 poke {REG3_right}, c-(int(c/256)*256)
+    61020 poke {REG4_right}, 2^(w+4)
+    61030 poke {REG5_right}, a*16+d
+    61040 poke {REG6_right}, s*16+r
     61050 return
 
     62000 print "{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}press:{down}"
@@ -144,6 +144,8 @@ const WAV_SAWTOOTH =  32
 const WAV_SQUARE   =  64
 const WAV_NOISE    = 128
 
+; keyboard split point
+const SPLIT_POINT = 24
 
 ; impostazioni SID da applicare a tutte le voci
 dim REG2 as byte   ; duty cycle low byte
@@ -153,17 +155,17 @@ dim REG5 as byte   ; attack + decay
 dim REG6 as byte   ; sustain + release
 
 ; impostazioni sid parte "split" LEFT
-dim REG2_left as byte init 0                  ; duty cycle low byte
-dim REG3_left as byte init 0                  ; duty cycle high byte
-dim REG4_left as byte init WAVEFORM_SAWTOOTH  ; waveform + gate a zero
-dim REG5_left as byte init 5*16+5             ; attack + decay
-dim REG6_left as byte init 15*16+5            ; sustain + release
+dim REG2_left as byte init 0                       ; duty cycle low byte
+dim REG3_left as byte init 8                       ; duty cycle high byte
+dim REG4_left as byte init WAV_SQUARE              ; waveform + gate a zero
+dim REG5_left as byte init  5*16+5                 ; attack + decay
+dim REG6_left as byte init 15*16+5                 ; sustain + release
 
 ; impostazioni sid parte "split" RIGHT
 dim REG2_right as byte init 0                 ; duty cycle low byte
 dim REG3_right as byte init 0                 ; duty cycle high byte
-dim REG4_right as byte init WAVEFORM_SQUARE   ; waveform + gate a zero
-dim REG5_right as byte init 5*16+5            ; attack + decay
+dim REG4_right as byte init WAV_SAWTOOTH      ; waveform + gate a zero
+dim REG5_right as byte init  5*16+5           ; attack + decay
 dim REG6_right as byte init 15*16+5           ; sustain + release
 
 ; ===== tasti premuti ====
@@ -353,13 +355,29 @@ sub play_new_key_x()
 end sub
 
 sub play_voice_y_key_x()
+
    tya                       ; indica che il tasto x suona la voce y
    sta key_voices,x          ;
    
    lda #VOICE_PLAYING        ; indica che la voce y sta suonando
    sta stato_voci,y          ;        
 
-   ; scrittura nel SID
+   ; === scrittura nel SID ===
+
+   ; stabilisce se split left o right
+   if x < #SPLIT_POINT then
+      ld REG2, REG2_left
+      ld REG3, REG3_left
+      ld REG4, REG4_left
+      ld REG5, REG5_left
+      ld REG6, REG6_left
+   else
+      ld REG2, REG2_right
+      ld REG3, REG3_right
+      ld REG4, REG4_right
+      ld REG5, REG5_right
+      ld REG6, REG6_right
+   end if
 
    sty voce              ; voce (non cambia per le tre scritture successive)
 
