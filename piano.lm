@@ -152,6 +152,20 @@ dim REG4 as byte   ; waveform + gate a zero
 dim REG5 as byte   ; attack + decay
 dim REG6 as byte   ; sustain + release
 
+; impostazioni sid parte "split" LEFT
+dim REG2_left as byte init 0                  ; duty cycle low byte
+dim REG3_left as byte init 0                  ; duty cycle high byte
+dim REG4_left as byte init WAVEFORM_SAWTOOTH  ; waveform + gate a zero
+dim REG5_left as byte init 5*16+5             ; attack + decay
+dim REG6_left as byte init 15*16+5            ; sustain + release
+
+; impostazioni sid parte "split" RIGHT
+dim REG2_right as byte init 0                 ; duty cycle low byte
+dim REG3_right as byte init 0                 ; duty cycle high byte
+dim REG4_right as byte init WAVEFORM_SQUARE   ; waveform + gate a zero
+dim REG5_right as byte init 5*16+5            ; attack + decay
+dim REG6_right as byte init 15*16+5           ; sustain + release
+
 ; ===== tasti premuti ====
 const KEY_RELEASED  = 0
 const KEY_PRESSED   = 1
