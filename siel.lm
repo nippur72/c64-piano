@@ -11,7 +11,7 @@ const SIEL_NKEYS  = 56      ; 49 tasti reali, i rimanenti sono fantasma
 // in chiaro nel buffer "curr_key_status"
 // =====================================================================================
 
-bit_counter: byte
+dim bit_counter as byte
 
 sub read_siel()
    ldy #0                            ; y points to curr_key_status

@@ -6,7 +6,7 @@
 //     riga: bit mask con i tasti premuti nella riga (0=premuto, 1=rilasciato)
 // =====================================================================================
 
-riga: byte 
+dim riga as byte
 
 sub read_c64_keyboard()   
    /*
