@@ -146,7 +146,7 @@ const WAV_SQUARE   =  64
 const WAV_NOISE    = 128
 
 ; keyboard split point
-const SPLIT_POINT = 24
+dim split_point as byte init 24
 
 ; impostazioni SID da applicare a tutte le voci
 dim REG2 as byte   ; duty cycle low byte
@@ -366,7 +366,7 @@ sub play_voice_y_key_x()
    ; === scrittura nel SID ===
 
    ; stabilisce se split left o right
-   if x < #SPLIT_POINT then
+   if x < split_point then
       ld REG2, REG2_left
       ld REG3, REG3_left
       ld REG4, REG4_left
