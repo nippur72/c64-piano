@@ -3,13 +3,15 @@
    ; TODO investigare bug che si scatena se si toglie 'include "irq.lm"' (macro ld16)
    ;
 
-   processor 6502
+#ifdef TARGET_DASM then processor 6502
+
 
    include <macros.lm>
    include <macros_16.lm>
    include <c64.lm>
 
-   org BASIC_RAM
+#ifdef TARGET_DASM then org BASIC_RAM
+#ifdef TARGET_CA65 then .org BASIC_RAM
 
    basic start compact
        10 nsid={(NVOCI/3)}
