@@ -172,18 +172,19 @@ dim REG6_right as byte init 15*16+5           ; sustain + release
 ; ===== tasti premuti ====
 const KEY_RELEASED  = 0
 const KEY_PRESSED   = 1
-last_key_status: ds SIEL_NKEYS, KEY_RELEASED    ; i tasti premuti al passaggio precedente
-curr_key_status: ds SIEL_NKEYS, KEY_RELEASED    ; i tasti attualmente premuti
-new_key_pressed: ds SIEL_NKEYS, KEY_RELEASED    ; i nuovi tasti premuti rispetto al passaggio precedente
+
+dim last_key_status(SIEL_NKEYS) as byte init KEY_RELEASED     ; i tasti premuti al passaggio precedente
+dim curr_key_status(SIEL_NKEYS) as byte init KEY_RELEASED     ; i tasti attualmente premuti
+dim new_key_pressed(SIEL_NKEYS) as byte init KEY_RELEASED     ; i nuovi tasti premuti rispetto al passaggio precedente
 
 ; ===== tasti collegati alle voci ====
 const VOICE_NONE = 255
-key_voices: ds SIEL_NKEYS, VOICE_NONE      ; quale voce (0..NVOCI-1) sta suonando il tasto
+dim key_voices(SIEL_NKEYS) as byte init VOICE_NONE            ; quale voce (0..NVOCI-1) sta suonando il tasto
 
 ; ==== stato delle voci del SID ====
 const VOICE_STOPPED = 0
 const VOICE_PLAYING = 1
-stato_voci: ds NVOCI, VOICE_STOPPED        ; stato delle voci dei SID (VOICE_STOPPED, VOICE_PLAYING)
+dim stato_voci(NVOCI) as byte init VOICE_STOPPED              ; stato delle voci dei SID (VOICE_STOPPED, VOICE_PLAYING)
 
 // =====================================================================================
 // stampa a video i buffer a scopo di debug
