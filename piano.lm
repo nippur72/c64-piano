@@ -114,7 +114,7 @@
    include "siel.lm"
    include "c64_keyboard.lm"
    include "freq.lm"
-   include "irq.lm"
+   ;include "irq.lm"
 
 ; ============ VOCI SID =============
 const NVOCI = 6

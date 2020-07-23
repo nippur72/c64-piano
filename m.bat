@@ -2,7 +2,7 @@
 rem node freq.js > freq.lm
 
 set name=piano
-set compiler=ca65
+set compiler=dasm
 
 rem compila per tastiera siel o per tastiera emulata
 rem set optsiel=KBD_SIEL
