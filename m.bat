@@ -2,7 +2,7 @@
 rem node freq.js > freq.lm
 
 set name=piano
-set compiler=dasm
+set compiler=ca65
 
 rem compila per tastiera siel o per tastiera emulata
 rem set optsiel=KBD_SIEL
@@ -12,6 +12,6 @@ if %compiler%==dasm call asmproc -i %name%.lm -o %name%.asm --target dasm -d %op
 if %compiler%==dasm dasm %name%.asm -o%name%.prg -l%name%.lst
 
 if %compiler%==ca65 call asmproc -i %name%.lm -o %name%.asm --target ca65 -d %optsiel%,TARGET_CA65
-if %compiler%==ca65 cl65 --config c64-asm.cfg %name%.asm -o %name%.prg
+if %compiler%==ca65 cl65 -l %name%.lst --config c64-asm.cfg %name%.asm -o %name%.prg
 
 
