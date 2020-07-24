@@ -1,0 +1,43 @@
+dim FREQKEY_LOW(SIEL_NKEYS) as byte    ; buffer contentente le frequenze assegnate ai tasti
+dim FREQKEY_HI(SIEL_NKEYS)  as byte    ;
+
+dim split_point      as byte   ; numero tasto di inizio parte right
+dim start_note_left  as byte   ; offset da sommare alla nota base per left
+dim start_note_right as byte   ; offset da sommare alla nota base per right
+
+// =====================================================================================
+// nome:  calc_split_freq
+//
+// scopo: crea le frequenze per la parte destra e sinistra della tastiera
+//        nel vettore FREQKEY_LOW(49)/FREQKEY_HI(49)
+//
+// input: split_point       - il numero del tasto dove inizia la parte "right"
+//        start_note_left   - offset da sommare alla nota base per left
+//        start_note_right  - offset da sommare alla nota base per right
+//        FREQTABLE_LOW(49) - tabella precalcolata delle note del SID
+//        FREQTABLE_HI(49)
+//
+// output: scrive in FREQKEY_LOW(), FREQKEY_HI()
+//
+// nota:  chiamata da Basic dopo l'impostazione dello split_point
+// =====================================================================================
+sub calc_split_freq()
+
+   for x=#(SIEL_NKEYS-1) to #0 step #-1
+      if x < split_point then
+         clc
+         txa
+         adc start_note_left        ; a = x + start_note_left
+      else
+         clc
+         txa
+         adc start_note_right
+         sec
+         sbc split_point            ; a = (x - split_point) + start_note_right
+      end if
+      tay
+      lda FREQTABLE_LOW,y : sta FREQKEY_LOW,x
+      lda FREQTABLE_HI,y  : sta FREQKEY_HI,x
+   next
+
+end sub

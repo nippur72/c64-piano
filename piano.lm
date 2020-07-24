@@ -1,10 +1,5 @@
-   ;
-   ; TODO convertire i for ... next in do ... loop con decremento
-   ; TODO investigare bug che si scatena se si toglie 'include "irq.lm"' (macro ld16)
-   ;
 
 #ifdef TARGET_DASM then processor 6502
-
 
    include <macros.lm>
    include <macros_16.lm>
@@ -37,6 +32,7 @@
       140 gosub 60000     
       150 gosub 61000
       160 gosub 62000
+      165 gosub 63000
       170 sys {main}
       180 if peek({exit_code})=7 then end
       190 if peek({exit_code})=1 then 210
@@ -109,12 +105,19 @@
     62020 print "f7 - to exit"
     62030 return
 
+    63000 rem === imposta lo split point
+    63010 poke {split_point}, 12
+    63020 poke {start_note_left}, 12*2
+    63030 poke {start_note_right}, 12*4
+    63040 sys {calc_split_freq}
+    63050 return
+
    basic end
 
    include "siel.lm"
    include "c64_keyboard.lm"
    include "freq.lm"
-   ;include "irq.lm"
+   include "split.lm"
 
 ; ============ VOCI SID =============
 const NVOCI = 6
@@ -146,9 +149,6 @@ const WAV_TRIANGLE =  16
 const WAV_SAWTOOTH =  32
 const WAV_SQUARE   =  64
 const WAV_NOISE    = 128
-
-; keyboard split point
-dim split_point as byte init 24
 
 ; impostazioni SID da applicare a tutte le voci
 dim REG2 as byte   ; duty cycle low byte
@@ -387,13 +387,13 @@ sub play_voice_y_key_x()
 
    ; ==== FREQ byte basso
    ld  regn, #0          ; registro (offset +0)
-   lda FREQTABLE_LOW,x   ;
+   lda FREQKEY_LOW,x     ;
    sta valore            ; valore
    jsr scrivi_voce       ;
 
    ; ==== FREQ byte alto
    inc regn              ; registro (offset +1)
-   lda FREQTABLE_HI,x    ;
+   lda FREQKEY_HI,x      ;
    sta valore            ; valore
    jsr scrivi_voce       ;
 
