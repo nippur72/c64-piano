@@ -19,22 +19,24 @@ function lo(x) {
 
 let notes = [ "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
+let NUM = 12 * 8;
+
 let f = [];
 let f_sid = [];
-for(let i=0; i<49; i++) {
+for(let i=0; i<NUM; i++) {
     let c = Math.pow(256,3)/985248;
-    let relative_tone = i-21;
+    let relative_tone = i-21-24;
     let freq = 440 * Math.pow(2, relative_tone/12);
     f.push(freq);
     f_sid.push(Math.round(freq * c));
 }
 
 console.log("FREQTABLE_LOW:");
-for(let i=0; i<49; i++) {
+for(let i=0; i<NUM; i++) {
     console.log(`   .byte ${lo(f_sid[i])}   ; ${notes[i%12]}${Math.floor(i/12)+1} = ${Math.round(f[i]*10)/10}`);
 }
 
 console.log("\nFREQTABLE_HI:");
-for(let i=0; i<49; i++) {
+for(let i=0; i<NUM; i++) {
     console.log(`   .byte ${hi(f_sid[i])}   ; ${notes[i%12]}${Math.floor(i/12)+1} = ${Math.round(f[i]*10)/10}`);
 }
