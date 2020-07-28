@@ -8,6 +8,9 @@
 #ifdef TARGET_DASM then org BASIC_RAM
 #ifdef TARGET_CA65 then .org BASIC_RAM
 
+#ifdef DEBUG then DEBUG_SCREEN=1
+#ifndef DEBUG then DEBUG_SCREEN=0
+
    basic start compact
        10 nsid={(NVOCI/3)}
        20 dim sid(nsid),sid$(nsid)
@@ -33,6 +36,7 @@
       150 gosub 61000
       160 gosub 62000
       165 gosub 63000
+      166 if {DEBUG_SCREEN}=1 then gosub 58000
       170 sys {main}
       180 if peek({exit_code})=7 then end
       190 if peek({exit_code})=1 then 210
@@ -72,6 +76,14 @@
     50150    k=k+1:if k=3 then j=j+1:k=0
     50160 next
     50170 return
+
+    58000 rem === debug screen
+    58010 print "{white}{clr}{yellow}curr key status:{down}{down}{down}"
+    58020 print "last key status:{down}{down}{down}"
+    58030 print "new key pressed:{down}{down}{down}"
+    58040 print "key voices:{down}{down}{down}"
+    58050 print "stato voci:"
+    58060 return
 
     59000 rem === convert hex in x$ to decimal in x
     59020 x=0
@@ -194,21 +206,21 @@ dim stato_voci(NVOCI) as byte init VOICE_STOPPED              ; stato delle voci
 sub dump_buffers()
    for x=#(SIEL_NKEYS-1) to #0 step #-1
       lda curr_key_status,x
-      sta VIDEO_RAM,x
+      sta VIDEO_RAM+(SCREEN_COLS*(0+1)),x
 
       lda last_key_status,x
-      sta VIDEO_RAM+SCREEN_COLS*4,x
+      sta VIDEO_RAM+(SCREEN_COLS*(4+1)),x
 
       lda new_key_pressed,x
-      sta VIDEO_RAM+SCREEN_COLS*8,x
+      sta VIDEO_RAM+(SCREEN_COLS*(8+1)),x
 
       lda key_voices,x
-      sta VIDEO_RAM+SCREEN_COLS*12,x
+      sta VIDEO_RAM+(SCREEN_COLS*(12+1)),x
    next
 
    for x=#(NVOCI-1) to #0 step #-1
       lda stato_voci,x
-      sta VIDEO_RAM+SCREEN_COLS*16,x
+      sta VIDEO_RAM+(SCREEN_COLS*(16+1)),x
    next
 end sub
 
