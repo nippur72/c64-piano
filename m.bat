@@ -1,17 +1,25 @@
 @echo off
 rem node freq.js > freq.lm
 
-set name=piano
 set compiler=ca65
+set timestamp=_2020_07_28
+set iname=piano
 
-rem compila per tastiera siel o per tastiera emulata
-rem set optsiel=KBD_SIEL
-set optsiel=KBD_EMULATED
+set optsiel=KBD_SIEL
+set name=piano%timestamp%
+call c.bat
 
-if %compiler%==dasm call asmproc -i %name%.lm -o %name%.asm --target dasm -d %optsiel%,TARGET_DASM
-if %compiler%==dasm dasm %name%.asm -o%name%.prg -l%name%.lst
+set optsiel=KBD_SIEL,DEBUG
+set name=piano_DEBUG%timestamp%
+call c.bat
 
-if %compiler%==ca65 call asmproc -i %name%.lm -o %name%.asm --target ca65 -d %optsiel%,TARGET_CA65
-if %compiler%==ca65 cl65 -l %name%.lst --config c64-asm.cfg %name%.asm -o %name%.prg
+set optsiel=KBD_EMU
+set name=piano_EMU%timestamp%
+call c.bat
+
+set optsiel=KBD_EMU,DEBUG
+set name=piano_EMU_DEBUG%timestamp%
+call c.bat
+
 
 
